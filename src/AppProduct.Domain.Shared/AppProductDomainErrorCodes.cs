@@ -1,0 +1,6 @@
+﻿namespace AppProduct;
+
+public static class AppProductDomainErrorCodes
+{
+    /* You can add your business exception error codes here, as constants */
+}
