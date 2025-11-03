@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
 
-namespace AppProduct.Entity
+namespace AppProduct.dtos.Products
 {
-    public class Product : FullAuditedAggregateRoot<long>
+    public class CreateProductDto
     {
         public string Code { get; set; } = string.Empty;
         public string? Name { get; set; }
