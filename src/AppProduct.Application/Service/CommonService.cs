@@ -59,7 +59,7 @@ namespace AppProduct.Service
             int totalCount = await AsyncExecuter.CountAsync(queryable);
 
             queryable = queryable.OrderBy(input.Sorting ?? "Id asc");
-                                 
+
             var entities = await AsyncExecuter.ToListAsync(
                 queryable.Skip(input.SkipCount).Take(input.MaxResultCount)
             );
@@ -78,7 +78,7 @@ namespace AppProduct.Service
         public async Task<TDto> UpdateAsync(TKey id, TUpdate input)
         {
             var entity = await _repository.GetAsync(id);
-            if(entity == null)
+            if (entity == null)
             {
                 throw new KeyNotFoundException($"Entity with id {id} not found.");
             }
@@ -110,3 +110,4 @@ namespace AppProduct.Service
             // Implement policy check logic here
         }
     }
+}

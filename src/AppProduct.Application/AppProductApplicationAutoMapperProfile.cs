@@ -1,4 +1,5 @@
 using AppProduct.dtos.Products;
+using AppProduct.Dtos.User;
 using AppProduct.Entity;
 using AutoMapper;
 
@@ -9,8 +10,9 @@ public class AppProductApplicationAutoMapperProfile : Profile
     public AppProductApplicationAutoMapperProfile()
     {
         //map user
-        CreateMap<AppUser, AppUserDto>();
-        CreateMap<AppUserDto, AppUser>();
+        CreateMap<AppUser, UserProfileDto>();
+        CreateMap<CreateUserDto, AppUser>();
+        CreateMap<UpdateUserDto, AppUser>();
 
         //map product   
         CreateMap<Product, ProductDto>();
