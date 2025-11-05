@@ -1,3 +1,4 @@
+using AppProduct.dtos.Category;
 using AppProduct.dtos.Products;
 using AppProduct.Dtos.User;
 using AppProduct.Entity;
@@ -17,5 +18,9 @@ public class AppProductApplicationAutoMapperProfile : Profile
         //map product   
         CreateMap<Product, ProductDto>();
         CreateMap<CreateProductDto, Product>();
+
+        //map category
+        CreateMap<Category, CategoryDto>();
+        CreateMap<CreateCategoryDto, Category>();
     }
 }

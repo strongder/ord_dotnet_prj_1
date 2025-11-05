@@ -28,9 +28,9 @@ public class AppProductDbContext :
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
-    DbSet<Product> Products { get; set; }
-    DbSet<Category> Categories { get; set; }
-    DbSet<AppUser> AppUsers { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<AppUser> AppUsers { get; set; }
     #region Entities from the modules
 
     /* Notice: We only implemented IIdentityProDbContext and ISaasDbContext
@@ -80,6 +80,6 @@ public class AppProductDbContext :
         builder.ConfigureIdentity();
         builder.ConfigureOpenIddict();
         builder.ConfigureTenantManagement();
-        builder.ConfigureBlobStoring()
+        builder.ConfigureBlobStoring();
     }
 }

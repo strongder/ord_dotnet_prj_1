@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace AppProduct.Dtos.Auth
 {
-    internal class LoginInputDto
+    public class LoginInputDto
     {
+        public string UserName { get; set; }
+        public string Password { get; set; }
     }
 }

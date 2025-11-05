@@ -1,5 +1,7 @@
 ﻿using AppProduct.Dtos;
 using AppProduct.IService;
+using AppProduct.Permissions;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +9,7 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 
@@ -25,39 +28,35 @@ namespace AppProduct.Service
 
         public async Task<TDto> CreateAsync(TCreate input)
         {
-            // Map TCreate -> Entity
+            //await CheckCreatePolicyAsync();
             var entity = ObjectMapper.Map<TCreate, TEntity>(input);
-
-            // Insert
             entity = await _repository.InsertAsync(entity, autoSave: true);
-
-            // Map Entity -> DTO
             return ObjectMapper.Map<TEntity, TDto>(entity);
         }
 
         public async Task DeleteAsync(TKey id)
         {
-            if (id == null)
-            {
-                throw new ArgumentNullException(nameof(id));
-            }
+            await CheckDeletePolicyAsync();
             await _repository.DeleteAsync(id);
         }
 
-        public async Task<TDto> GetAsync(TKey id)
+        public async Task<TDto> UpdateAsync(TKey id, TUpdate input)
         {
+            await CheckUpdatePolicyAsync();
             var entity = await _repository.GetAsync(id);
+            ObjectMapper.Map(input, entity);
+            entity = await _repository.UpdateAsync(entity, autoSave: true);
             return ObjectMapper.Map<TEntity, TDto>(entity);
         }
 
-        public async Task<PagedResultDto<TDto>> GetListAsync(PageInputDto input)
+        public virtual async Task<PagedResultDto<TDto>> GetListAsync(PageInputDto input)
         {
-            CheckGetPagePolicy();
+            await AuthorizationService.CheckAsync(AppProductPermissions.ProductPermissions.GetPage);
+
             var queryable = await _repository.GetQueryableAsync();
             queryable = BuildListQuery(queryable, input);
 
             int totalCount = await AsyncExecuter.CountAsync(queryable);
-
             queryable = queryable.OrderBy(input.Sorting ?? "Id asc");
 
             var entities = await AsyncExecuter.ToListAsync(
@@ -69,45 +68,42 @@ namespace AppProduct.Service
                 ObjectMapper.Map<List<TEntity>, List<TDto>>(entities)
             );
         }
+        public async Task<TDto> GetAsync(TKey id)
+        {
+            var entity = await _repository.GetAsync(id);
+            return ObjectMapper.Map<TEntity, TDto>(entity);
+        }
 
         protected virtual IQueryable<TEntity> BuildListQuery(IQueryable<TEntity> queryable, PageInputDto pageInput)
         {
             return queryable;
         }
 
-        public async Task<TDto> UpdateAsync(TKey id, TUpdate input)
+
+        protected virtual Task CheckCreatePolicyAsync()
         {
-            var entity = await _repository.GetAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Entity with id {id} not found.");
-            }
-            ObjectMapper.Map(input, entity);
-            entity = await _repository.UpdateAsync(entity, autoSave: true);
-            return ObjectMapper.Map<TEntity, TDto>(entity);
+            return CheckPolicyAsync(GetCreatePolicyName());
         }
 
-        public void CheckCreatePolicy()
+        protected virtual Task CheckUpdatePolicyAsync()
         {
-            // Implement policy check logic here
-        }
-        public void CheckUpdatePolicy()
-        {
-            // Implement policy check logic her
-        }
-        public void CheckDeletePolicy()
-        {
-            // Implement policy check logic here
+            return CheckPolicyAsync(GetUpdatePolicyName());
         }
 
-        public void CheckGetAllPolicy()
+        protected virtual Task CheckDeletePolicyAsync()
         {
-            // Implement policy check logic here
+            return CheckPolicyAsync(GetDeletePolicyName());
         }
 
-        public void CheckGetPagePolicy()
+        protected virtual Task CheckGetPagePolicyAsync()
         {
-            // Implement policy check logic here
+            return CheckPolicyAsync(GetGetPagePolicyName());
         }
+
+        protected virtual string GetCreatePolicyName() => null;
+        protected virtual string GetUpdatePolicyName() => null;
+        protected virtual string GetDeletePolicyName() => null;
+        protected virtual string GetGetPagePolicyName() => null;
+
     }
 }
